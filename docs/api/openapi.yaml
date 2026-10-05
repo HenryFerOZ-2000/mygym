@@ -1,0 +1,2592 @@
+openapi: 3.0.3
+info:
+  title: MyGym API
+  version: 1.0.0
+paths:
+  /api/v1/auth/csrf/:
+    get:
+      operationId: auth_csrf_retrieve
+      tags:
+      - auth
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CsrfToken'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/auth/login/:
+    post:
+      operationId: auth_login_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      parameters:
+      - name: X-CSRFToken
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Token obtenido en auth/csrf/; usar cookie del mismo origen.
+  /api/v1/auth/logout/:
+    post:
+      operationId: auth_logout_create
+      tags:
+      - auth
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutResult'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      parameters:
+      - name: X-CSRFToken
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Token obtenido en auth/csrf/; usar cookie del mismo origen.
+  /api/v1/auth/me/:
+    get:
+      operationId: auth_me_retrieve
+      tags:
+      - auth
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/health/:
+    get:
+      operationId: health_retrieve
+      tags:
+      - health
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/me/workspaces/:
+    get:
+      operationId: me_workspaces_list
+      tags:
+      - me
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workspace'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/attendance/:
+    get:
+      operationId: workspaces_attendance_retrieve
+      parameters:
+      - in: query
+        name: date
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: page
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - in: query
+        name: page_size
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 25
+      - in: query
+        name: q
+        schema:
+          type: string
+          default: ''
+          maxLength: 120
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - workspaces
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendancePage'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/attendance/{attendance_id}/void/:
+    post:
+      operationId: workspaces_attendance_void_create
+      parameters:
+      - in: path
+        name: attendance_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: X-CSRFToken
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Token obtenido en auth/csrf/; usar cookie del mismo origen.
+      tags:
+      - workspaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Void'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceRead'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/attendance/clients/:
+    get:
+      operationId: workspaces_attendance_clients_retrieve
+      parameters:
+      - in: query
+        name: date
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: page
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - in: query
+        name: page_size
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 25
+      - in: query
+        name: q
+        schema:
+          type: string
+          default: ''
+          maxLength: 120
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - workspaces
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchPage'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/clients/:
+    get:
+      operationId: clients_list
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: page_size
+        schema:
+          type: integer
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - workspaces
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientPage'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    post:
+      operationId: workspaces_clients_create
+      parameters:
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: X-CSRFToken
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Token obtenido en auth/csrf/; usar cookie del mismo origen.
+      tags:
+      - workspaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientWrite'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientRead'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/clients/{client_id}/:
+    get:
+      operationId: workspaces_clients_retrieve
+      parameters:
+      - in: path
+        name: client_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - workspaces
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientRead'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    patch:
+      operationId: workspaces_clients_partial_update
+      parameters:
+      - in: path
+        name: client_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: X-CSRFToken
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Token obtenido en auth/csrf/; usar cookie del mismo origen.
+      tags:
+      - workspaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedClientWrite'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientRead'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/clients/{client_id}/attendance/:
+    post:
+      operationId: workspaces_clients_attendance_create
+      parameters:
+      - in: path
+        name: client_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: X-CSRFToken
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Token obtenido en auth/csrf/; usar cookie del mismo origen.
+      tags:
+      - workspaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttendanceWrite'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceRead'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/clients/{client_id}/attendance/preview/:
+    get:
+      operationId: workspaces_clients_attendance_preview_retrieve
+      parameters:
+      - in: path
+        name: client_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - workspaces
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendancePreview'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/clients/{client_id}/gym/:
+    get:
+      operationId: workspaces_clients_gym_retrieve
+      parameters:
+      - in: path
+        name: client_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - workspaces
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipPage'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/clients/{client_id}/gym/memberships/:
+    post:
+      operationId: workspaces_clients_gym_memberships_create
+      parameters:
+      - in: path
+        name: client_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: X-CSRFToken
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Token obtenido en auth/csrf/; usar cookie del mismo origen.
+      tags:
+      - workspaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Enrollment'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipRead'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/clients/{client_id}/gym/memberships/{membership_id}/cancel/:
+    post:
+      operationId: workspaces_clients_gym_memberships_cancel_create
+      parameters:
+      - in: path
+        name: client_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: membership_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: X-CSRFToken
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Token obtenido en auth/csrf/; usar cookie del mismo origen.
+      tags:
+      - workspaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cancel'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipRead'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/clients/{client_id}/gym/memberships/{membership_id}/correct/:
+    post:
+      operationId: workspaces_clients_gym_memberships_correct_create
+      parameters:
+      - in: path
+        name: client_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: membership_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: X-CSRFToken
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Token obtenido en auth/csrf/; usar cookie del mismo origen.
+      tags:
+      - workspaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Change'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipRead'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/clients/{client_id}/gym/memberships/{membership_id}/freeze/:
+    post:
+      operationId: workspaces_clients_gym_memberships_freeze_create
+      parameters:
+      - in: path
+        name: client_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: membership_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: X-CSRFToken
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Token obtenido en auth/csrf/; usar cookie del mismo origen.
+      tags:
+      - workspaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Change'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MembershipRead'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/clients/{client_id}/gym/preview/:
+    post:
+      operationId: workspaces_clients_gym_preview_create
+      parameters:
+      - in: path
+        name: client_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: X-CSRFToken
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Token obtenido en auth/csrf/; usar cookie del mismo origen.
+      tags:
+      - workspaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Preview'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewRead'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/clients/{client_id}/receivables/:
+    get:
+      operationId: workspaces_clients_receivables_retrieve
+      parameters:
+      - in: path
+        name: client_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - workspaces
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChargePage'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/clients/{client_id}/receivables/payments/:
+    get:
+      operationId: workspaces_clients_receivables_payments_retrieve
+      parameters:
+      - in: path
+        name: client_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - workspaces
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPage'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    post:
+      operationId: workspaces_clients_receivables_payments_create
+      parameters:
+      - in: path
+        name: client_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: X-CSRFToken
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Token obtenido en auth/csrf/; usar cookie del mismo origen.
+      tags:
+      - workspaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentRead'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/clients/{client_id}/receivables/payments/{payment_id}/refunds/:
+    post:
+      operationId: workspaces_clients_receivables_payments_refunds_create
+      parameters:
+      - in: path
+        name: client_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: payment_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: X-CSRFToken
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Token obtenido en auth/csrf/; usar cookie del mismo origen.
+      tags:
+      - workspaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Refund'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundRead'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/gym/expiries/:
+    get:
+      operationId: workspaces_gym_expiries_retrieve
+      parameters:
+      - in: query
+        name: horizon
+        schema:
+          type: integer
+          maximum: 90
+          minimum: 1
+          default: 7
+      - in: query
+        name: page
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - in: query
+        name: page_size
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 25
+      - in: query
+        name: q
+        schema:
+          type: string
+          default: ''
+          maxLength: 120
+      - in: query
+        name: status
+        schema:
+          enum:
+          - EXPIRING
+          - ACTIVE
+          - EXPIRED
+          - FROZEN
+          - FUTURE
+          - NO_MEMBERSHIP
+          - CLIENT_INACTIVE
+          type: string
+          default: EXPIRING
+          minLength: 1
+        description: |-
+          * `EXPIRING` - EXPIRING
+          * `ACTIVE` - ACTIVE
+          * `EXPIRED` - EXPIRED
+          * `FROZEN` - FROZEN
+          * `FUTURE` - FUTURE
+          * `NO_MEMBERSHIP` - NO_MEMBERSHIP
+          * `CLIENT_INACTIVE` - CLIENT_INACTIVE
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - workspaces
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpiryPage'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/gym/plans/:
+    get:
+      operationId: workspaces_gym_plans_retrieve
+      parameters:
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - workspaces
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanPage'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    post:
+      operationId: workspaces_gym_plans_create
+      parameters:
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: X-CSRFToken
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Token obtenido en auth/csrf/; usar cookie del mismo origen.
+      tags:
+      - workspaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanWrite'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanRead'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/gym/plans/{plan_id}/:
+    patch:
+      operationId: workspaces_gym_plans_partial_update
+      parameters:
+      - in: path
+        name: plan_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: X-CSRFToken
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Token obtenido en auth/csrf/; usar cookie del mismo origen.
+      tags:
+      - workspaces
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPlanPatch'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanRead'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/reports/attendance/:
+    get:
+      operationId: workspaces_reports_attendance_retrieve
+      parameters:
+      - in: query
+        name: from_date
+        schema:
+          type: string
+          format: date
+        required: true
+      - in: query
+        name: to_date
+        schema:
+          type: string
+          format: date
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - workspaces
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceReport'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/v1/workspaces/{workspace_id}/reports/financial/:
+    get:
+      operationId: workspaces_reports_financial_retrieve
+      parameters:
+      - in: query
+        name: from_date
+        schema:
+          type: string
+          format: date
+        required: true
+      - in: query
+        name: to_date
+        schema:
+          type: string
+          format: date
+        required: true
+      - in: path
+        name: workspace_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - workspaces
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialReport'
+          description: ''
+        '400':
+          description: Validación o credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Sin sesión, CSRF inválido o permiso insuficiente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Workspace no autorizado/inexistente o ficha ajena
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+components:
+  schemas:
+    Allocation:
+      type: object
+      properties:
+        charge_id:
+          type: string
+          format: uuid
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+      required:
+      - amount
+      - charge_id
+    AttendancePage:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+          nullable: true
+        previous:
+          type: integer
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttendanceRead'
+      required:
+      - count
+      - next
+      - previous
+      - results
+    AttendancePreview:
+      type: object
+      properties:
+        client_id:
+          type: string
+          format: uuid
+        full_name:
+          type: string
+        status:
+          type: string
+        membership_id:
+          type: string
+          format: uuid
+          nullable: true
+        last_day:
+          type: string
+          format: date
+          nullable: true
+        previous_last_day:
+          type: string
+          format: date
+          nullable: true
+        next_start:
+          type: string
+          format: date
+          nullable: true
+        local_date:
+          type: string
+          format: date
+        today_count:
+          type: integer
+        timezone:
+          type: string
+      required:
+      - client_id
+      - full_name
+      - last_day
+      - local_date
+      - membership_id
+      - next_start
+      - previous_last_day
+      - status
+      - timezone
+      - today_count
+    AttendanceRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        client_id:
+          type: string
+          format: uuid
+        full_name:
+          type: string
+        actor:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        local_date:
+          type: string
+          format: date
+        timezone:
+          type: string
+        decision:
+          type: string
+        service_status:
+          type: string
+        reason:
+          type: string
+        voided:
+          type: boolean
+        void_reason:
+          type: string
+          nullable: true
+        void_actor:
+          type: string
+          nullable: true
+        voided_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - actor
+      - client_id
+      - created_at
+      - decision
+      - full_name
+      - id
+      - local_date
+      - reason
+      - service_status
+      - timezone
+      - void_actor
+      - void_reason
+      - voided
+      - voided_at
+    AttendanceReport:
+      type: object
+      properties:
+        from_date:
+          type: string
+          format: date
+        to_date:
+          type: string
+          format: date
+        as_of:
+          type: string
+          format: date-time
+        entries:
+          type: integer
+        clients:
+          type: integer
+        exceptions:
+          type: integer
+        voided:
+          type: integer
+      required:
+      - as_of
+      - clients
+      - entries
+      - exceptions
+      - from_date
+      - to_date
+      - voided
+    AttendanceWrite:
+      type: object
+      properties:
+        request_id:
+          type: string
+          format: uuid
+        expected_date:
+          type: string
+          format: date
+        expected_count:
+          type: integer
+          minimum: 0
+        confirm_repeat:
+          type: boolean
+          default: false
+        exception:
+          type: boolean
+          default: false
+        reason:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - expected_count
+      - expected_date
+      - request_id
+    Cancel:
+      type: object
+      properties:
+        request_id:
+          type: string
+          format: uuid
+        reason:
+          type: string
+          maxLength: 300
+        effective_date:
+          type: string
+          format: date
+      required:
+      - effective_date
+      - reason
+      - request_id
+    Change:
+      type: object
+      properties:
+        request_id:
+          type: string
+          format: uuid
+        reason:
+          type: string
+          maxLength: 300
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+      - end_date
+      - reason
+      - request_id
+      - start_date
+    ChargePage:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+          nullable: true
+        previous:
+          type: integer
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChargeRead'
+      required:
+      - count
+      - next
+      - previous
+      - results
+    ChargeRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        source:
+          type: string
+          format: uuid
+        label:
+          type: string
+        amount:
+          type: string
+        balance:
+          type: string
+        currency:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - amount
+      - balance
+      - created_at
+      - currency
+      - id
+      - label
+      - source
+    ClientPage:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          nullable: true
+        previous:
+          type: string
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientRead'
+      required:
+      - count
+      - next
+      - previous
+      - results
+    ClientRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        full_name:
+          type: string
+          readOnly: true
+        phone:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - email
+      - full_name
+      - id
+      - is_active
+      - phone
+      - updated_at
+    ClientWrite:
+      type: object
+      properties:
+        full_name:
+          type: string
+          maxLength: 200
+        phone:
+          type: string
+          maxLength: 32
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        is_active:
+          type: boolean
+      required:
+      - full_name
+    CsrfToken:
+      type: object
+      properties:
+        csrfToken:
+          type: string
+      required:
+      - csrfToken
+    CurrencyReport:
+      type: object
+      properties:
+        currency:
+          type: string
+        payments:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,22}(?:\.\d{0,2})?$
+        refunds:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,22}(?:\.\d{0,2})?$
+        net:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,22}(?:\.\d{0,2})?$
+        outstanding_now:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,22}(?:\.\d{0,2})?$
+      required:
+      - currency
+      - net
+      - outstanding_now
+      - payments
+      - refunds
+    Enrollment:
+      type: object
+      properties:
+        plan_id:
+          type: string
+          format: uuid
+        start_date:
+          type: string
+          format: date
+        request_id:
+          type: string
+          format: uuid
+        expected_version:
+          type: integer
+          minimum: 1
+        expected_start:
+          type: string
+          format: date
+        expected_end:
+          type: string
+          format: date
+      required:
+      - expected_end
+      - expected_start
+      - expected_version
+      - plan_id
+      - request_id
+      - start_date
+    ExpiryPage:
+      type: object
+      properties:
+        as_of:
+          type: string
+          format: date-time
+        reference_date:
+          type: string
+          format: date
+        timezone:
+          type: string
+        count:
+          type: integer
+        next:
+          type: integer
+          nullable: true
+        previous:
+          type: integer
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpiryRow'
+      required:
+      - as_of
+      - count
+      - next
+      - previous
+      - reference_date
+      - results
+      - timezone
+    ExpiryRow:
+      type: object
+      properties:
+        client_id:
+          type: string
+          format: uuid
+        full_name:
+          type: string
+        status:
+          type: string
+        coverage_end:
+          type: string
+          format: date
+          nullable: true
+        previous_end:
+          type: string
+          format: date
+          nullable: true
+        next_start:
+          type: string
+          format: date
+          nullable: true
+        last_day:
+          type: string
+          format: date
+          nullable: true
+        calendar_days_remaining:
+          type: integer
+          nullable: true
+      required:
+      - calendar_days_remaining
+      - client_id
+      - coverage_end
+      - full_name
+      - last_day
+      - next_start
+      - previous_end
+      - status
+    FinancialReport:
+      type: object
+      properties:
+        from_date:
+          type: string
+          format: date
+        to_date:
+          type: string
+          format: date
+        timezone:
+          type: string
+        as_of:
+          type: string
+          format: date-time
+        currencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrencyReport'
+      required:
+      - as_of
+      - currencies
+      - from_date
+      - timezone
+      - to_date
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+      required:
+      - password
+      - username
+    LogoutResult:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    MembershipPage:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+          nullable: true
+        previous:
+          type: integer
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MembershipRead'
+      required:
+      - count
+      - next
+      - previous
+      - results
+    MembershipRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        version:
+          type: integer
+        amount:
+          type: string
+        currency:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        last_day:
+          type: string
+          format: date
+          nullable: true
+        cancelled_on:
+          type: string
+          format: date
+          nullable: true
+        status:
+          type: string
+        remaining_days:
+          type: integer
+        freezes:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        changes:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - amount
+      - cancelled_on
+      - changes
+      - currency
+      - end_date
+      - freezes
+      - id
+      - last_day
+      - name
+      - remaining_days
+      - start_date
+      - status
+      - version
+    MethodEnum:
+      enum:
+      - CASH
+      - TRANSFER
+      type: string
+      description: |-
+        * `CASH` - CASH
+        * `TRANSFER` - TRANSFER
+    PatchedClientWrite:
+      type: object
+      properties:
+        full_name:
+          type: string
+          maxLength: 200
+        phone:
+          type: string
+          maxLength: 32
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        is_active:
+          type: boolean
+    PatchedPlanPatch:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        unit:
+          $ref: '#/components/schemas/UnitEnum'
+        quantity:
+          type: integer
+          maximum: 3650
+          minimum: 1
+        is_active:
+          type: boolean
+          default: true
+        is_promotion:
+          type: boolean
+          default: false
+        available_from:
+          type: string
+          format: date
+          nullable: true
+        available_until:
+          type: string
+          format: date
+          nullable: true
+        expected_version:
+          type: integer
+          minimum: 1
+    Payment:
+      type: object
+      properties:
+        request_id:
+          type: string
+          format: uuid
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        method:
+          $ref: '#/components/schemas/MethodEnum'
+        allocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Allocation'
+      required:
+      - allocations
+      - amount
+      - currency
+      - method
+      - request_id
+    PaymentPage:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+          nullable: true
+        previous:
+          type: integer
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentRead'
+      required:
+      - count
+      - next
+      - previous
+      - results
+    PaymentRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        amount:
+          type: string
+        currency:
+          type: string
+        method:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        allocations:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        refunds:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - allocations
+      - amount
+      - created_at
+      - currency
+      - id
+      - method
+      - refunds
+    PlanPage:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+          nullable: true
+        previous:
+          type: integer
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlanRead'
+      required:
+      - count
+      - next
+      - previous
+      - results
+    PlanRead:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        unit:
+          $ref: '#/components/schemas/UnitEnum'
+        quantity:
+          type: integer
+          maximum: 3650
+          minimum: 1
+        is_active:
+          type: boolean
+          default: true
+        is_promotion:
+          type: boolean
+          default: false
+        available_from:
+          type: string
+          format: date
+          nullable: true
+        available_until:
+          type: string
+          format: date
+          nullable: true
+        id:
+          type: string
+          format: uuid
+        version:
+          type: integer
+      required:
+      - amount
+      - currency
+      - id
+      - name
+      - quantity
+      - unit
+      - version
+    PlanWrite:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        unit:
+          $ref: '#/components/schemas/UnitEnum'
+        quantity:
+          type: integer
+          maximum: 3650
+          minimum: 1
+        is_active:
+          type: boolean
+          default: true
+        is_promotion:
+          type: boolean
+          default: false
+        available_from:
+          type: string
+          format: date
+          nullable: true
+        available_until:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - amount
+      - currency
+      - name
+      - quantity
+      - unit
+    Preview:
+      type: object
+      properties:
+        plan_id:
+          type: string
+          format: uuid
+        start_date:
+          type: string
+          format: date
+      required:
+      - plan_id
+      - start_date
+    PreviewRead:
+      type: object
+      properties:
+        plan_id:
+          type: string
+          format: uuid
+        version:
+          type: integer
+        name:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        last_day:
+          type: string
+          format: date
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        currency:
+          type: string
+      required:
+      - amount
+      - currency
+      - end_date
+      - last_day
+      - name
+      - plan_id
+      - start_date
+      - version
+    Refund:
+      type: object
+      properties:
+        request_id:
+          type: string
+          format: uuid
+        reason:
+          type: string
+          maxLength: 300
+        allocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Allocation'
+      required:
+      - allocations
+      - reason
+      - request_id
+    RefundRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        amount:
+          type: string
+      required:
+      - amount
+      - id
+    SearchClient:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        full_name:
+          type: string
+        is_active:
+          type: boolean
+      required:
+      - full_name
+      - id
+      - is_active
+    SearchPage:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+          nullable: true
+        previous:
+          type: integer
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchClient'
+      required:
+      - count
+      - next
+      - previous
+      - results
+    UnitEnum:
+      enum:
+      - DAYS
+      - MONTHS
+      type: string
+      description: |-
+        * `DAYS` - DAYS
+        * `MONTHS` - MONTHS
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+      required:
+      - id
+      - username
+    Void:
+      type: object
+      properties:
+        request_id:
+          type: string
+          format: uuid
+        reason:
+          type: string
+          maxLength: 300
+      required:
+      - reason
+      - request_id
+    Workspace:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        kind:
+          type: string
+        timezone:
+          type: string
+        role:
+          type: string
+        capabilities:
+          type: array
+          items:
+            type: string
+      required:
+      - capabilities
+      - id
+      - kind
+      - name
+      - role
+      - timezone
+    ApiError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          - fields
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            fields:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
