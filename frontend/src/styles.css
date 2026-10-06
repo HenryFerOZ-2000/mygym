@@ -15,7 +15,9 @@ body {
   margin: 0;
 }
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
 button,
@@ -35,7 +37,7 @@ button {
 }
 button:disabled {
   opacity: 0.55;
-  cursor: wait;
+  cursor: not-allowed;
 }
 a {
   color: inherit;
@@ -43,7 +45,9 @@ a {
 }
 button:focus-visible,
 a:focus-visible,
-input:focus-visible {
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
   outline: 3px solid #89a764;
   outline-offset: 3px;
 }
@@ -130,7 +134,7 @@ label {
   background: #274d39;
   color: white;
 }
-.primary:hover {
+.primary:not(:disabled):hover {
   background: #193c29;
 }
 .secondary {
@@ -138,7 +142,7 @@ label {
   border-color: #dbe1d8;
   color: #344c3d;
 }
-.secondary:hover {
+.secondary:not(:disabled):hover {
   background: #f1f5ed;
 }
 .full {
@@ -154,7 +158,8 @@ label {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
-.error-box {
+.error-box,
+.error-note {
   background: #fcf0ed;
   color: #963d2c;
   padding: 13px 15px;
@@ -1175,4 +1180,70 @@ tr:last-child td {
   .report-filters label {
     min-width: 0;
   }
+}
+
+/* Shared controls keep the established palette and touch targets. */
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sidebar nav + nav {
+  margin-top: 6px;
+}
+.sidebar nav a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+.sidebar nav a:not(.nav-active) {
+  color: #d1e2c5;
+}
+.sidebar nav a:not(.nav-active):hover {
+  background: #ffffff12;
+}
+@media (max-width: 700px) {
+  .sidebar {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+  .sidebar nav {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex: 1 0 100%;
+    order: 2;
+    margin: 0;
+  }
+  .sidebar nav > .eyebrow {
+    display: none;
+  }
+}
+
+button[aria-busy="true"] {
+  cursor: wait;
+}
+.icon-button,
+.text-button {
+  min-width: 44px;
+  min-height: 44px;
+}
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background: #f1f5ed;
+  color: #748077;
+  cursor: not-allowed;
+}
+
+input[type="checkbox"] {
+  accent-color: #385b36;
+}
+/* Labels own vertical spacing in operational forms. */
+.gym-dialog input:not([type="checkbox"]),
+.gym-card input:not([type="checkbox"]) {
+  margin-bottom: 0;
 }

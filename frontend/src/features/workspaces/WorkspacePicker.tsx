@@ -24,7 +24,7 @@ export function WorkspacePicker({ user }: { user: User }) {
         {workspaces.isError && (
           <div role="alert" className="error-box">
             No pudimos cargar tus espacios.{" "}
-            <button onClick={() => void workspaces.refetch()}>
+            <button className="button secondary" onClick={() => void workspaces.refetch()}>
               Reintentar
             </button>
           </div>

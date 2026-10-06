@@ -72,7 +72,7 @@ export function RetryError({
   onRetry: () => void;
 }) {
   return (
-    <div role="alert">
+    <div role="alert" className="error-box">
       <p>{message(error)}</p>
       <button className="button secondary" disabled={busy} onClick={onRetry}>
         {busy ? "Consultando…" : label}
@@ -195,7 +195,7 @@ export function OperationDialog({
           >
             Cerrar
           </button>
-          <button className="button primary" disabled={busy}>
+          <button className="button primary" disabled={busy} aria-busy={busy}>
             {busy ? "Guardando…" : submitLabel}
           </button>
         </div>

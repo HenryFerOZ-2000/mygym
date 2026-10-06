@@ -9,6 +9,7 @@ export function LogoutButton() {
       <button
         className="text-button"
         disabled={busy}
+        aria-busy={busy}
         onClick={async () => {
           setBusy(true);
           setError(false);

@@ -146,7 +146,7 @@ export function ClientForm({
           >
             Cancelar
           </button>
-          <button className="button primary" disabled={busy}>
+          <button className="button primary" disabled={busy} aria-busy={busy}>
             {busy
               ? "Guardando…"
               : record

@@ -151,3 +151,11 @@ Plan: docs/superpowers/plans/core.md
 - Verificación final y publicación de rama pendientes al escribir esta entrada; se registran abajo una vez confirmadas. Backup/restore siguiente etapa; no LAN, servicio Windows ni instalador comercial.
 
 - Cierre verificado: 87 backend en 148.03s sin warnings + 7 Vitest + 19 Playwright Local en 52.1s = 113 pruebas. Ruff/ESLint, tipos/build, pip check, Django check Local, OpenAPI y guardia runtime/owner aprobados; makemigrations sin cambios. Captura inspeccionada, diff sin whitespace ni secretos detectados, .env/.local excluidos. Demo Local adicional iniciada en 127.0.0.1:8765; no se creo admin persistente. Commit/push autorizado de rama se confirma por SHA remoto en el cierre de tarea.
+
+## Consistencia visual - 2026-10-06
+
+- Se conserva la paleta, textos y estructura existentes. Navegacion operativa visible y utilizable en movil, con permisos existentes; agrupacion vertical en escritorio.
+- Controles compartidos: foco verde para select/textarea, checkbox verde, objetivos tactiles de 44px, reintento secundario y paneles de error coherentes. Hover inactivo conserva fondo; cursor de espera reservado a botones aria-busy. Eliminado margen duplicado de campos Gym.
+- RED: enlaces ocultos en movil, foco nativo en select, hover sobre paginacion deshabilitada y reintento sin estilo. GREEN: seis casos visuales Local en 360/768/1280px, teclado, espera y fallo controlado sin guardar planes.
+- Verificacion: 87 backend en 159.25s, 7 Vitest y 25 Playwright Local = 119 pruebas. Build final con manifest, ESLint, pip check, preflight Local y diff --check aprobados. Backend no modificado por el ajuste visual final; se repitieron build/lint/unitarias/navegador afectados.
+- Capturas finales de formulario movil y escritorio inspeccionadas, con datos ficticios de mygym_e2e. MyGym-visual-final.png guardada en ChatGPT Library. Sin cambios de cuentas/contrasenas, migraciones, restore ni terminal del usuario. Backups siguen pendientes de diseno.

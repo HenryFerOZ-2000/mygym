@@ -101,7 +101,7 @@ export function Login() {
                 {error}
               </div>
             )}
-            <button className="button primary full" disabled={busy}>
+            <button className="button primary full" disabled={busy} aria-busy={busy}>
               {busy ? "Entrando…" : "Entrar"} <span aria-hidden="true">↗</span>
             </button>
           </form>
