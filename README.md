@@ -88,4 +88,14 @@ Resultados y limitaciones: [registro](docs/operations/IMPLEMENTATION_LOG.md).
 
 No es un instalador comercial ni un despliegue productivo. `runserver` y Vite son exclusivamente desarrollo loopback.
 No incluye facturación fiscal, pasarela, cobro automático, fotos, portal de clientes, MFA ni recuperación comercial.
-No hay repositorio remoto, commits, compras ni despliegues realizados.
+Código versionado en https://github.com/HenryFerOZ-2000/mygym. Sin despliegue público.
+
+## Servidor Local inicial
+
+```powershell
+.\scripts\build-local.ps1
+.\scripts\start-local.ps1 -Check
+.\scripts\start-local.ps1
+```
+
+Abre **http://127.0.0.1:8765**; detén con `Ctrl+C`. Waitress sirve React compilado y API. El arranque verifica configuración, build, migraciones y RLS sin modificar esquema. [Preparación, demo y límites](docs/operations/local-delivery.md).

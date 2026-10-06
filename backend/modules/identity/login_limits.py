@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.utils.crypto import salted_hmac
 
 from .models import LoginAttempt
+from .demo_access import demo_access_denied
 
 
 def authenticate_limited(request, username, password):
@@ -41,6 +42,8 @@ def authenticate_limited(request, username, password):
         if any(row.failures >= limits[row.key] for row in rows):
             return None
         user = authenticate(request, username=username, password=password)
+        if demo_access_denied(user):
+            user = None
         for row in rows:
             if user is None:
                 row.failures += 1

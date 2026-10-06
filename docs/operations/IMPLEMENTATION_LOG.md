@@ -138,3 +138,16 @@ Plan: docs/superpowers/plans/core.md
 - Revisados archivos candidatos, exclusiones de .env/.local/dependencias/bases/certificados y patrones de claves; sin secretos detectados en los archivos candidatos. .env.example contiene únicamente marcadores.
 - Publicación de código; sin cambios funcionales ni despliegue. No se repite la suite de aplicación para esta operación de Git; su evidencia anterior permanece registrada arriba.
 - Comprobación de publicación: git push -u origin main y comparación de HEAD con refs/heads/main del remoto.
+
+## Local inicial - 2026-10-06
+
+- Checkout D:\Documentos\OZCorp\MyGym en Lenovo-Henry; VS Code confirmado abierto. Baseline main limpio fb37326f84a35d0e8854c7a12d42225c2811bbdb, también main remoto. Rama codex/local-runtime. CLI no permite certificar buffers sin guardar; no se guardó/cerró editor. No .agents/.github versionados.
+- Python 3.13.4, Node 22.16.0. Regresión inicial PostgreSQL: 77 backend en 121.79s. No migraciones de base activa ni restore.
+- RED Local ausente; GREEN guardias build/configuración/rutas/DB/migraciones/RLS. Waitress 3.0.2 instalado únicamente en .venv y fijado; scripts build/start/check, mismo origen loopback 8765. Local sin seed_demo; cookies separadas de desarrollo.
+- Primera verificación: 83 backend + 7 Vitest + 19 Playwright contra Waitress/build/mygym_e2e. Ruff, ESLint, build, Django check, OpenAPI, ausencia de nuevas migraciones y guardia runtime/propietario aprobados. Advertencia inicial del test override DATABASES corregida mediante restauración scoped de configuración sin conexiones remotas.
+- Captura .local/local-login.png inspeccionada: login vacío, legible y sin secretos. Una desconexión del ejecutor impidió cierre; recuperación posterior conserva todos los cambios.
+- Pedido posterior de admin sólo demo: se prepara comando interactivo, sin ejecutar en base persistente. Usuario único admin, OWNER de gimnasios ficticios, nunca staff/superuser; contraseña introducida/confirmada localmente, sin valor por defecto. Grupo demo-only sin permisos globales; login y sesión lo bloquean fuera de DEMO_ENABLED. Validadores globales intactos.
+- RED demuestra que una sesión demo era aceptada fuera de demo. GREEN después del bloqueo de login y middleware. Inventario positivo de la prueba acotado a filas sembradas reales para preservar fixtures existentes de mygym_test; escrituras de cuenta/grupo/accesos usan SQL real y rollback. Producción conserva guardias estrictas de inventario.
+- Verificación final y publicación de rama pendientes al escribir esta entrada; se registran abajo una vez confirmadas. Backup/restore siguiente etapa; no LAN, servicio Windows ni instalador comercial.
+
+- Cierre verificado: 87 backend en 148.03s sin warnings + 7 Vitest + 19 Playwright Local en 52.1s = 113 pruebas. Ruff/ESLint, tipos/build, pip check, Django check Local, OpenAPI y guardia runtime/owner aprobados; makemigrations sin cambios. Captura inspeccionada, diff sin whitespace ni secretos detectados, .env/.local excluidos. Demo Local adicional iniciada en 127.0.0.1:8765; no se creo admin persistente. Commit/push autorizado de rama se confirma por SHA remoto en el cierre de tarea.
