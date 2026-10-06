@@ -25,3 +25,6 @@ playwright-report/
 media/
 backups/
 .superpowers/
+
+*.mygym-recovery
+.recovery-*

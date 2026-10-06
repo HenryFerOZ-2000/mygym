@@ -99,3 +99,11 @@ Código versionado en https://github.com/HenryFerOZ-2000/mygym. Sin despliegue p
 ```
 
 Abre **http://127.0.0.1:8765**; detén con `Ctrl+C`. Waitress sirve React compilado y API. El arranque verifica configuración, build, migraciones y RLS sin modificar esquema. [Preparación, demo y límites](docs/operations/local-delivery.md).
+
+## Ensayo protegido de recuperacion (preparacion)
+
+```powershell
+.\scripts\check-recovery.ps1 -Fixture
+```
+
+Protege e inspecciona un archivo de solo esquema de mygym_test con PostgreSQL 17 y el usuario Windows actual. No exporta filas ni restaura una base. Sin -Fixture el preflight rechaza el runtime actual: faltan identidades de respaldo/recuperacion aprobadas y un destino nuevo. No es un backup portable ni recuperacion comercial. [Alcance, comandos, permisos pendientes y protocolo](docs/operations/backup-recovery.md).
